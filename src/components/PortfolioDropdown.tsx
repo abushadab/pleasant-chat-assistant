@@ -1,3 +1,4 @@
+
 // src/components/PortfolioDropdown.tsx
 import React, { useContext, useEffect, useState } from 'react';
 import { AppDataContext, PortfolioItem } from '../context/AppDataContext';
@@ -42,7 +43,7 @@ export default function PortfolioDropdown() {
   };
 
   if (loading) {
-    return <div>Loading portfolio...</div>;
+    return <div className="py-2 px-3 bg-gray-100 rounded animate-pulse">Loading portfolio...</div>;
   }
 
   return (
@@ -50,7 +51,7 @@ export default function PortfolioDropdown() {
       id="portfolio" 
       value={selectedPortfolio ? selectedPortfolio.team_id : ""} 
       onChange={handleSelectionChange} 
-      className="border rounded p-2 w-full"
+      className="form-select"
     >
       <option value="" disabled>
         Select a portfolio

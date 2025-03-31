@@ -1,3 +1,4 @@
+
 // src/components/TaskDropdown.tsx
 import React, { useContext, useEffect, useState } from 'react';
 import { AppDataContext, Task } from '../context/AppDataContext';
@@ -43,7 +44,7 @@ export default function TaskDropdown() {
   };
 
   if (loading) {
-    return <div>Loading Task...</div>;
+    return <div className="py-2 px-3 bg-gray-100 rounded animate-pulse">Loading Task...</div>;
   }
 
   return (
@@ -51,7 +52,7 @@ export default function TaskDropdown() {
       id="task" 
       value={selectedTask ? selectedTask.task_id : ""} 
       onChange={handleSelectionChange} 
-      className="border rounded p-2 w-full"
+      className="form-select"
     >
       <option value="" disabled>
         Select a Task

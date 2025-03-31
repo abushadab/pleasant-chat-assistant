@@ -1,3 +1,4 @@
+
 // src/components/LoginPage.tsx
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
@@ -21,35 +22,51 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100">
-      <form onSubmit={handleLogin} className="bg-white p-6 rounded shadow-md w-[480px]">
-        <img src="/images/logo-transparent.png" alt="Logo" className="w-[300px] mb-4" />
-        <h2 className="text-xl font-bold mb-4">Login</h2>
-        {error && <p className="mb-4 text-red-500">{error}</p>}
+    <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+      <form onSubmit={handleLogin} className="card w-[480px] max-w-full mx-4">
+        <div className="flex justify-center mb-6">
+          <img src="/images/logo-transparent.png" alt="Logo" className="w-[300px]" />
+        </div>
+        <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Welcome Back</h2>
+        
+        {error && (
+          <div className="mb-6 p-3 bg-red-50 border border-red-200 text-red-600 rounded-md">
+            {error}
+          </div>
+        )}
+        
         <div className="mb-4">
-          <label htmlFor="email" className="block mb-1">Email:</label>
+          <label htmlFor="email" className="form-label">Email Address</label>
           <input
             type="email"
             id="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border rounded px-3 py-2"
+            className="form-input"
             required
+            placeholder="you@example.com"
           />
         </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block mb-1">Password:</label>
+        
+        <div className="mb-6">
+          <label htmlFor="password" className="form-label">Password</label>
           <input
             type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border rounded px-3 py-2"
+            className="form-input"
             required
+            placeholder="••••••••"
           />
         </div>
-        <button type="submit" disabled={loading} className="w-full bg-blue-500 text-white py-2 rounded">
-          {loading ? 'Logging in...' : 'Login'}
+        
+        <button 
+          type="submit" 
+          disabled={loading} 
+          className={`btn btn-primary w-full ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+        >
+          {loading ? 'Signing in...' : 'Sign In'}
         </button>
       </form>
     </div>
