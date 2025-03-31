@@ -1,8 +1,10 @@
+
 // src/components/UrlMappingsPage.tsx
 import React, { useEffect, useState, useContext } from 'react';
 import { supabase } from '../supabaseClient';
 import { AppDataContext } from '../context/AppDataContext';
 import { storageAdapter } from '../utils/storageAdapter';
+import { Edit, Trash2, PlusCircle, Link, Building, FolderKanban, ListTodo, Save, X } from 'lucide-react';
 
 interface UrlMapping {
   url_mapping_id: number;
@@ -261,179 +263,230 @@ const UrlMappingsPage = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">URL Mappings</h1>
+      <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
+        <Link size={24} className="text-primary-500" />
+        URL Mappings
+      </h1>
 
       {/* Form to add or edit a URL mapping */}
-      <form onSubmit={handleSubmit} className="mb-6 space-y-4">
-        {/* Dropdown for Teams */}
-        <div>
-          <label className="block mb-1">Team:</label>
-          <select
-            value={selectedTeam}
-            onChange={(e) =>
-              setSelectedTeam(e.target.value ? parseInt(e.target.value) : '')
-            }
-            className="border rounded p-2 w-full"
-            required
-          >
-            <option value="">Select a team</option>
-            {teams.map((team) => (
-              <option key={team.team_id} value={team.team_id}>
-                {team.name}
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="mb-8 bg-gray-50 rounded-lg p-6 border border-gray-200 shadow-sm">
+        <h2 className="text-lg font-medium mb-4 flex items-center gap-2">
+          {editingMapping ? (
+            <>
+              <Edit size={20} className="text-yellow-500" />
+              Edit URL Mapping
+            </>
+          ) : (
+            <>
+              <PlusCircle size={20} className="text-primary-500" />
+              Add New URL Mapping
+            </>
+          )}
+        </h2>
+        
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left column - Team, Project, Task */}
+          <div className="space-y-4">
+            {/* Dropdown for Teams */}
+            <div>
+              <label className="form-label flex items-center gap-1">
+                <Building size={16} className="text-gray-500" />
+                Team
+              </label>
+              <select
+                value={selectedTeam}
+                onChange={(e) =>
+                  setSelectedTeam(e.target.value ? parseInt(e.target.value) : '')
+                }
+                className="form-select"
+                required
+              >
+                <option value="">Select a team</option>
+                {teams.map((team) => (
+                  <option key={team.team_id} value={team.team_id}>
+                    {team.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Dropdown for Projects */}
-        <div>
-          <label className="block mb-1">Project:</label>
-          <select
-            value={selectedProject}
-            onChange={(e) =>
-              setSelectedProject(e.target.value ? parseInt(e.target.value) : '')
-            }
-            className="border rounded p-2 w-full"
-            required
-            disabled={selectedTeam === ''}
-          >
-            <option value="">Select a project</option>
-            {projects.map((project) => (
-              <option key={project.project_id} value={project.project_id}>
-                {project.name}
-              </option>
-            ))}
-          </select>
-        </div>
+            {/* Dropdown for Projects */}
+            <div>
+              <label className="form-label flex items-center gap-1">
+                <FolderKanban size={16} className="text-gray-500" />
+                Project
+              </label>
+              <select
+                value={selectedProject}
+                onChange={(e) =>
+                  setSelectedProject(e.target.value ? parseInt(e.target.value) : '')
+                }
+                className="form-select"
+                required
+                disabled={selectedTeam === ''}
+              >
+                <option value="">Select a project</option>
+                {projects.map((project) => (
+                  <option key={project.project_id} value={project.project_id}>
+                    {project.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-        {/* Dropdown for Tasks */}
-        <div>
-          <label className="block mb-1">Task:</label>
-          <select
-            value={selectedTask}
-            onChange={(e) =>
-              setSelectedTask(e.target.value ? parseInt(e.target.value) : '')
-            }
-            className="border rounded p-2 w-full"
-            required
-            disabled={selectedProject === ''}
-          >
-            <option value="">Select a task</option>
-            {tasks.map((task) => (
-              <option key={task.task_id} value={task.task_id}>
-                {task.title}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Fields for Title and URL */}
-        <div>
-          <label className="block mb-1">Title:</label>
-          <input
-            type="text"
-            value={formTitle}
-            onChange={(e) => setFormTitle(e.target.value)}
-            className="border rounded p-2 w-full"
-            required
-          />
-        </div>
-        <div>
-          <label className="block mb-1">URL:</label>
-          <input
+            {/* Dropdown for Tasks */}
+            <div>
+              <label className="form-label flex items-center gap-1">
+                <ListTodo size={16} className="text-gray-500" />
+                Task
+              </label>
+              <select
+                value={selectedTask}
+                onChange={(e) =>
+                  setSelectedTask(e.target.value ? parseInt(e.target.value) : '')
+                }
+                className="form-select"
+                required
+                disabled={selectedProject === ''}
+              >
+                <option value="">Select a task</option>
+                {tasks.map((task) => (
+                  <option key={task.task_id} value={task.task_id}>
+                    {task.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          
+          {/* Right column - Title, URL, Buttons */}
+          <div className="space-y-4">
+            {/* Fields for Title and URL */}
+            <div>
+              <label className="form-label">Title</label>
+              <input
+                type="text"
+                value={formTitle}
+                onChange={(e) => setFormTitle(e.target.value)}
+                className="form-input"
+                required
+                placeholder="Enter a descriptive title"
+              />
+            </div>
+            <div>
+              <label className="form-label">URL</label>
+              <input
                 type="text"
                 value={formUrl}
                 onChange={(e) => setFormUrl(e.target.value)}
                 placeholder="https://example.com"
                 pattern="[Hh][Tt][Tt][Pp][Ss]?:\/\/(?:(?:[a-zA-Z\u00a1-\uffff0-9]+-?)*[a-zA-Z\u00a1-\uffff0-9]+)(?:\.(?:[a-zA-Z\u00a1-\uffff0-9]+-?)*[a-zA-Z\u00a1-\uffff0-9]+)*(?:\.(?:[a-zA-Z\u00a1-\uffff]{2,}))(?::\d{2,5})?(?:\/[^\s]*)?"
-                className="border rounded p-2 w-full"
+                className="form-input"
                 required
-            />
-        </div>
-        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded">
-          {editingMapping ? 'Update Mapping' : 'Add Mapping'}
-        </button>
-        {editingMapping && (
-          <button
-            type="button"
-            onClick={resetForm}
-            className="ml-2 bg-gray-500 text-white px-4 py-2 rounded"
-          >
-            Cancel
-          </button>
-        )}
-      </form>
+              />
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-4">
+              {editingMapping && (
+                <button
+                  type="button"
+                  onClick={resetForm}
+                  className="btn btn-secondary flex items-center"
+                >
+                  <X size={16} />
+                  Cancel
+                </button>
+              )}
+              <button type="submit" className="btn btn-primary flex items-center">
+                <Save size={16} />
+                {editingMapping ? 'Update' : 'Save'}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
 
       {/* Display list of URL mappings */}
-      {loading ? (
-        <p>Loading mappings...</p>
-      ) : (
-        <table className="w-full border-collapse">
-          <thead>
-            <tr>
-              <th className="border p-2">Title</th>
-              <th className="border p-2">URL</th>
-              <th className="border p-2">Team</th>
-              <th className="border p-2">Project</th>
-              <th className="border p-2">Task</th>
-              <th className="border p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {urlMappings.map((mapping) => {
-              const teamName =
-                teams.find((team) => team.team_id === mapping.team_id)?.name ||
-                '-';
-              const projectName =
-                allProjects.find(
-                  (project) => project.project_id === mapping.project_id
-                )?.name || '-';
-              const taskTitle =
-                allTasks.find((task) => task.task_id === mapping.task_id)
-                  ?.title || '-';
+      <div className="table-container overflow-x-auto">
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500 mb-2"></div>
+            <p className="text-gray-600">Loading mappings...</p>
+          </div>
+        ) : (
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="table-header">Title</th>
+                <th className="table-header">URL</th>
+                <th className="table-header">Team</th>
+                <th className="table-header">Project</th>
+                <th className="table-header">Task</th>
+                <th className="table-header">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {urlMappings.map((mapping) => {
+                const teamName =
+                  teams.find((team) => team.team_id === mapping.team_id)?.name ||
+                  '-';
+                const projectName =
+                  allProjects.find(
+                    (project) => project.project_id === mapping.project_id
+                  )?.name || '-';
+                const taskTitle =
+                  allTasks.find((task) => task.task_id === mapping.task_id)
+                    ?.title || '-';
 
-              return (
-                <tr key={mapping.url_mapping_id}>
-                  <td className="border p-2">{mapping.title}</td>
-                  <td className="border p-2">
-                    <a
-                      href={mapping.url || '#'}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {mapping.url}
-                    </a>
-                  </td>
-                  <td className="border p-2">{teamName}</td>
-                  <td className="border p-2">{projectName}</td>
-                  <td className="border p-2">{taskTitle}</td>
-                  <td className="border p-2">
-                    <button
-                      onClick={() => handleEdit(mapping)}
-                      className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(mapping)}
-                      className="bg-red-500 text-white px-2 py-1 rounded"
-                    >
-                      Delete
-                    </button>
+                return (
+                  <tr key={mapping.url_mapping_id} className="hover:bg-gray-50 transition-colors">
+                    <td className="table-cell font-medium">{mapping.title}</td>
+                    <td className="table-cell">
+                      <a
+                        href={mapping.url || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-primary-600 hover:underline flex items-center gap-1"
+                      >
+                        <Link size={14} />
+                        {mapping.url}
+                      </a>
+                    </td>
+                    <td className="table-cell">{teamName}</td>
+                    <td className="table-cell">{projectName}</td>
+                    <td className="table-cell">{taskTitle}</td>
+                    <td className="table-cell whitespace-nowrap">
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={() => handleEdit(mapping)}
+                          className="btn btn-secondary py-1 px-2"
+                        >
+                          <Edit size={14} />
+                          <span className="sr-only">Edit</span>
+                        </button>
+                        <button
+                          onClick={() => handleDelete(mapping)}
+                          className="btn btn-danger py-1 px-2"
+                        >
+                          <Trash2 size={14} />
+                          <span className="sr-only">Delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+              {urlMappings.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="text-center py-8 text-gray-500">
+                    No URL mappings found. Create your first one above.
                   </td>
                 </tr>
-              );
-            })}
-            {urlMappings.length === 0 && (
-              <tr>
-                <td colSpan={6} className="text-center p-4">
-                  No URL mappings found.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      )}
+              )}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 };
