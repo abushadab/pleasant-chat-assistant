@@ -1,3 +1,4 @@
+
 // src/background.ts
 import { supabase } from './supabaseClient';
 
@@ -151,10 +152,10 @@ function captureAndSendScreenshot() {
           // Build timelog record data
           const timelogRecord = {
             task_id: task.task_id,            // Ensure this matches your column type
-            user_id: user.id,               // Optionally set user id if available (e.g., via supabase.auth)
-            duration: null,              // You can calculate duration if needed
-            image: imageData.publicUrl,  // Public URL of the uploaded image
-            website: activeTabUrl       // URL of the active tab
+            user_id: user.id,                 // Optionally set user id if available (e.g., via supabase.auth)
+            duration: null,                    // You can calculate duration if needed
+            image: imageData.publicUrl,        // Public URL of the uploaded image
+            website: activeTabUrl             // URL of the active tab
           };
 
           // Insert the timelog record into Supabase table 'timelogs'
