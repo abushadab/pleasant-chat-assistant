@@ -1,7 +1,8 @@
-// src/pages/UrlMappingsPage.tsx
+// src/components/UrlMappingsPage.tsx
 import React, { useEffect, useState, useContext } from 'react';
 import { supabase } from '../supabaseClient';
 import { AppDataContext } from '../context/AppDataContext';
+import { storageAdapter } from '../utils/storageAdapter';
 
 interface UrlMapping {
   url_mapping_id: number;
@@ -71,7 +72,7 @@ const UrlMappingsPage = () => {
 
   // Save URL mappings to local storage whenever they change
   useEffect(() => {
-    chrome.storage.local.set({ urlMappings }, () => {
+    storageAdapter.set({ urlMappings }, () => {
       console.log("URL mappings saved to local storage");
     });
   }, [urlMappings]);
