@@ -19,6 +19,11 @@ export default defineConfig(({ mode }) => ({
     },
   },
   css: {
-    postcss: './postcss.config.js', // Reference the existing PostCSS config
+    postcss: {
+      plugins: [
+        require('tailwindcss'),
+        require('autoprefixer')
+      ],
+    },
   }
 }))
