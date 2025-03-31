@@ -1,69 +1,55 @@
-# Welcome to your Lovable project
 
-## Project info
+# Time Tracker Chrome Extension
 
-**URL**: https://lovable.dev/projects/7b5891be-4cb4-45b6-9b08-08b669fbe31c
+A simple time tracking application that can be used as a Chrome extension. Track your time on different tasks and projects, and export your data.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- Start, pause, and stop time tracking
+- Name your tasks
+- View your time tracking history
+- Export your data as JSON
+- Settings for notifications and behavior
 
-**Use Lovable**
+## How to Use as a Chrome Extension
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/7b5891be-4cb4-45b6-9b08-08b669fbe31c) and start prompting.
+1. Build the project:
+   ```
+   npm run build
+   ```
 
-Changes made via Lovable will be committed automatically to this repo.
+2. Open Chrome and navigate to `chrome://extensions/`
+  
+3. Enable "Developer mode" (toggle in the top right)
+  
+4. Click "Load unpacked" and select the `dist` folder from this project
+  
+5. The extension should now be installed. Click the extension icon in the Chrome toolbar to open it.
 
-**Use your preferred IDE**
+## Development
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+To run the project locally:
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Building
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+To build the project for production:
 
-**Use GitHub Codespaces**
+```
+npm run build
+```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Notes
 
-## What technologies are used for this project?
+- Time entries are stored in your browser's local storage
+- For the extension version, data is synced through Chrome's storage API
+- You can export your data and import it later
 
-This project is built with .
+## License
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+MIT
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/7b5891be-4cb4-45b6-9b08-08b669fbe31c) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
