@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.4",
+    "@tailwindcss/postcss": "^4.0.17",
     "@tailwindcss/vite": "^4.0.12",
     "autoprefixer": "^10.4.21",
     "lovable-tagger": "^1.1.8",
