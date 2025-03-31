@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Clock, Play, Pause, Stop, Calendar, Settings } from "lucide-react";
+import { Clock, Play, Pause, Square, Calendar, Settings } from "lucide-react";
 import TimeTrackingHistory from "@/components/TimeTrackingHistory";
 import { useToast } from "@/hooks/use-toast";
 
@@ -184,7 +184,7 @@ const Index = () => {
                   variant="destructive" 
                   className="flex items-center gap-2"
                 >
-                  <Stop className="h-4 w-4" />
+                  <Square className="h-4 w-4" />
                   Stop
                 </Button>
               </>
