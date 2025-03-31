@@ -1,5 +1,7 @@
+
 // src/components/SessionTimer.tsx
 import React, { useState, useEffect } from 'react';
+import { Square, Play } from 'lucide-react';
 
 const SessionTimer = () => {
   const [elapsedTime, setElapsedTime] = useState(0); // in milliseconds
@@ -48,9 +50,17 @@ const SessionTimer = () => {
       </p>
       <button
         onClick={toggleTimer}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
       >
-        {isRunning ? 'Stop' : 'Start'}
+        {isRunning ? (
+          <>
+            <Square className="w-5 h-5" /> Stop
+          </>
+        ) : (
+          <>
+            <Play className="w-5 h-5" /> Start
+          </>
+        )}
       </button>
     </div>
   );
