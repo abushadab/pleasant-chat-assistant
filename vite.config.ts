@@ -23,8 +23,8 @@ export default defineConfig(({ mode }) => ({
   css: {
     postcss: {
       plugins: [
-        tailwindcssPostcss,
-        autoprefixer
+        tailwindcssPostcss(),  // Call it as a function
+        autoprefixer()         // Call it as a function
       ],
     },
   }
