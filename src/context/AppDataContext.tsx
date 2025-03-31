@@ -1,6 +1,7 @@
 
 // src/context/AppDataContext.tsx
 import React, { createContext, useState, useEffect, FC, ReactNode } from 'react';
+import { storageAdapter } from '../utils/storageAdapter';
 
 export interface PortfolioItem {
   team_id: string;
@@ -51,81 +52,6 @@ export const AppDataContext = createContext<AppDataContextType | undefined>(unde
 interface AppDataProviderProps {
   children: ReactNode;
 }
-
-// Check if we're running in a Chrome extension context
-const isChromeExtension = typeof chrome !== 'undefined' && chrome.storage !== undefined;
-
-// Create a storage adapter that works in both environments
-const storageAdapter = {
-  get: (keys: string | string[] | Record<string, any>, callback: (result: any) => void) => {
-    if (isChromeExtension) {
-      chrome.storage.local.get(keys, callback);
-    } else {
-      // In development, use localStorage as a fallback
-      const result: Record<string, any> = {};
-      if (Array.isArray(keys)) {
-        keys.forEach(key => {
-          const value = localStorage.getItem(key);
-          if (value) {
-            try {
-              result[key] = JSON.parse(value);
-            } catch {
-              result[key] = value;
-            }
-          }
-        });
-      } else if (typeof keys === 'string') {
-        const value = localStorage.getItem(keys);
-        if (value) {
-          try {
-            result[keys] = JSON.parse(value);
-          } catch {
-            result[keys] = value;
-          }
-        }
-      } else {
-        Object.keys(keys).forEach(key => {
-          const value = localStorage.getItem(key);
-          if (value) {
-            try {
-              result[key] = JSON.parse(value);
-            } catch {
-              result[key] = value;
-            }
-          } else {
-            result[key] = keys[key]; // Default value
-          }
-        });
-      }
-      callback(result);
-    }
-  },
-  set: (items: Record<string, any>, callback?: () => void) => {
-    if (isChromeExtension) {
-      chrome.storage.local.set(items, callback);
-    } else {
-      // In development, use localStorage as a fallback
-      Object.entries(items).forEach(([key, value]) => {
-        localStorage.setItem(key, JSON.stringify(value));
-      });
-      if (callback) callback();
-    }
-  },
-  onChanged: {
-    addListener: (callback: (changes: Record<string, any>, areaName: string) => void) => {
-      if (isChromeExtension) {
-        chrome.storage.onChanged.addListener(callback);
-      }
-      // We don't have a good way to listen for localStorage changes
-      // in a different context, so this is a no-op in development
-    },
-    removeListener: (callback: (changes: Record<string, any>, areaName: string) => void) => {
-      if (isChromeExtension) {
-        chrome.storage.onChanged.removeListener(callback);
-      }
-    }
-  }
-};
 
 export const AppDataProvider: FC<AppDataProviderProps> = ({ children }) => {
   const [niftyToken, setNiftyToken] = useState<string | null>(null);

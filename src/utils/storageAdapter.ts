@@ -51,7 +51,12 @@ export const storageAdapter = {
   },
   set: (items: Record<string, any>, callback?: () => void) => {
     if (isChromeExtension) {
-      chrome.storage.local.set(items, callback);
+      // Only pass the callback if it's defined
+      if (callback) {
+        chrome.storage.local.set(items, callback);
+      } else {
+        chrome.storage.local.set(items);
+      }
     } else {
       // In development, use localStorage as a fallback
       Object.entries(items).forEach(([key, value]) => {
@@ -80,7 +85,11 @@ export const storageAdapter = {
 export const runtimeAdapter = {
   sendMessage: (message: any, callback?: (response: any) => void) => {
     if (isChromeExtension) {
-      chrome.runtime.sendMessage(message, callback);
+      if (callback) {
+        chrome.runtime.sendMessage(message, callback);
+      } else {
+        chrome.runtime.sendMessage(message);
+      }
     } else {
       // In development, simulate responses
       if (message.type === 'GET_ELAPSED_TIME') {
