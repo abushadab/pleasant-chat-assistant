@@ -1,13 +1,11 @@
 
-// src/components/SessionTimer.tsx
-import React, { useState, useEffect } from 'react';
-import { Square, Play } from 'lucide-react';
+// src/utils/storageAdapter.ts
 
 // Check if we're running in a Chrome extension context
-const isChromeExtension = typeof chrome !== 'undefined' && chrome.storage !== undefined;
+export const isChromeExtension = typeof chrome !== 'undefined' && chrome.storage !== undefined;
 
 // Create a storage adapter that works in both environments
-const storageAdapter = {
+export const storageAdapter = {
   get: (keys: string | string[] | Record<string, any>, callback: (result: any) => void) => {
     if (isChromeExtension) {
       chrome.storage.local.get(keys, callback);
@@ -61,11 +59,25 @@ const storageAdapter = {
       });
       if (callback) callback();
     }
+  },
+  onChanged: {
+    addListener: (callback: (changes: Record<string, any>, areaName: string) => void) => {
+      if (isChromeExtension) {
+        chrome.storage.onChanged.addListener(callback);
+      }
+      // We don't have a good way to listen for localStorage changes
+      // in a different context, so this is a no-op in development
+    },
+    removeListener: (callback: (changes: Record<string, any>, areaName: string) => void) => {
+      if (isChromeExtension) {
+        chrome.storage.onChanged.removeListener(callback);
+      }
+    }
   }
 };
 
 // Create a runtime messaging adapter
-const runtimeAdapter = {
+export const runtimeAdapter = {
   sendMessage: (message: any, callback?: (response: any) => void) => {
     if (isChromeExtension) {
       chrome.runtime.sendMessage(message, callback);
@@ -101,73 +113,10 @@ const runtimeAdapter = {
         }
         
         if (callback) callback({ success: true });
+      } else if (message.type === 'CALL_REACT_FUNCTION') {
+        console.log('Development mode received request:', message.payload);
+        if (callback) callback({ result: 'Development mode processing complete' });
       }
     }
   }
 };
-
-const SessionTimer = () => {
-  const [elapsedTime, setElapsedTime] = useState(0); // in milliseconds
-  const [isRunning, setIsRunning] = useState(false);
-
-  // Function to fetch elapsed time and running state from storage
-  const fetchElapsedTime = () => {
-    // Request elapsed time
-    runtimeAdapter.sendMessage({ type: 'GET_ELAPSED_TIME' }, (response) => {
-      if (response && typeof response.elapsed === 'number') {
-        setElapsedTime(response.elapsed);
-      }
-    });
-    
-    // Also update isRunning state directly from storage
-    storageAdapter.get('isRunning', (result) => {
-      setIsRunning(result.isRunning || false);
-    });
-  };
-
-  // Toggle timer state
-  const toggleTimer = () => {
-    runtimeAdapter.sendMessage({ type: 'TOGGLE_TIMER' }, (response) => {
-      // Optionally, you can update local isRunning state after toggling.
-      // Here we rely on the subsequent polling to update the state.
-    });
-  };
-
-  // Poll for elapsed time every second
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      fetchElapsedTime();
-    }, 1000);
-    return () => clearInterval(intervalId);
-  }, []);
-
-  // Convert elapsed time (ms) into total seconds, then hours and minutes
-  const totalSeconds = Math.floor(elapsedTime / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
-  const formattedMinutes = minutes.toString().padStart(2, '0');
-
-  return (
-    <div className="flex flex-col items-center">
-      <p className="text-2xl mb-4">
-        Session Time: {hours}hrs {formattedMinutes}m
-      </p>
-      <button
-        onClick={toggleTimer}
-        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center gap-2"
-      >
-        {isRunning ? (
-          <>
-            <Square className="w-5 h-5" /> Stop
-          </>
-        ) : (
-          <>
-            <Play className="w-5 h-5" /> Start
-          </>
-        )}
-      </button>
-    </div>
-  );
-};
-
-export default SessionTimer;

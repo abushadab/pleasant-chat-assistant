@@ -1,3 +1,4 @@
+
 // src/context/AppDataContext.tsx
 import React, { createContext, useState, useEffect, FC, ReactNode } from 'react';
 
@@ -51,6 +52,81 @@ interface AppDataProviderProps {
   children: ReactNode;
 }
 
+// Check if we're running in a Chrome extension context
+const isChromeExtension = typeof chrome !== 'undefined' && chrome.storage !== undefined;
+
+// Create a storage adapter that works in both environments
+const storageAdapter = {
+  get: (keys: string | string[] | Record<string, any>, callback: (result: any) => void) => {
+    if (isChromeExtension) {
+      chrome.storage.local.get(keys, callback);
+    } else {
+      // In development, use localStorage as a fallback
+      const result: Record<string, any> = {};
+      if (Array.isArray(keys)) {
+        keys.forEach(key => {
+          const value = localStorage.getItem(key);
+          if (value) {
+            try {
+              result[key] = JSON.parse(value);
+            } catch {
+              result[key] = value;
+            }
+          }
+        });
+      } else if (typeof keys === 'string') {
+        const value = localStorage.getItem(keys);
+        if (value) {
+          try {
+            result[keys] = JSON.parse(value);
+          } catch {
+            result[keys] = value;
+          }
+        }
+      } else {
+        Object.keys(keys).forEach(key => {
+          const value = localStorage.getItem(key);
+          if (value) {
+            try {
+              result[key] = JSON.parse(value);
+            } catch {
+              result[key] = value;
+            }
+          } else {
+            result[key] = keys[key]; // Default value
+          }
+        });
+      }
+      callback(result);
+    }
+  },
+  set: (items: Record<string, any>, callback?: () => void) => {
+    if (isChromeExtension) {
+      chrome.storage.local.set(items, callback);
+    } else {
+      // In development, use localStorage as a fallback
+      Object.entries(items).forEach(([key, value]) => {
+        localStorage.setItem(key, JSON.stringify(value));
+      });
+      if (callback) callback();
+    }
+  },
+  onChanged: {
+    addListener: (callback: (changes: Record<string, any>, areaName: string) => void) => {
+      if (isChromeExtension) {
+        chrome.storage.onChanged.addListener(callback);
+      }
+      // We don't have a good way to listen for localStorage changes
+      // in a different context, so this is a no-op in development
+    },
+    removeListener: (callback: (changes: Record<string, any>, areaName: string) => void) => {
+      if (isChromeExtension) {
+        chrome.storage.onChanged.removeListener(callback);
+      }
+    }
+  }
+};
+
 export const AppDataProvider: FC<AppDataProviderProps> = ({ children }) => {
   const [niftyToken, setNiftyToken] = useState<string | null>(null);
   const [portfolios, setPortfolios] = useState<PortfolioItem[]>([]);
@@ -61,9 +137,9 @@ export const AppDataProvider: FC<AppDataProviderProps> = ({ children }) => {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
 
-  // Load initial values from chrome.storage on mount.
+  // Load initial values from storage on mount.
   useEffect(() => {
-    chrome.storage.local.get(
+    storageAdapter.get(
       [
         'niftyToken',
         'portfolios',
@@ -87,10 +163,10 @@ export const AppDataProvider: FC<AppDataProviderProps> = ({ children }) => {
     );
   }, []);
 
-  // Poll chrome.storage for niftyToken changes every 5 seconds.
+  // Poll storage for niftyToken changes every 5 seconds.
   useEffect(() => {
     const fetchTokenFromStorage = () => {
-      chrome.storage.local.get('niftyToken', (result) => {
+      storageAdapter.get('niftyToken', (result) => {
         if (result.niftyToken && result.niftyToken !== niftyToken) {
           console.log("Pulled new niftyToken from storage:", result.niftyToken);
           setNiftyToken(result.niftyToken);
@@ -103,10 +179,10 @@ export const AppDataProvider: FC<AppDataProviderProps> = ({ children }) => {
     return () => clearInterval(interval);
   }, [niftyToken]);
 
-  // Poll chrome.storage for user changes every 5 seconds.
+  // Poll storage for user changes every 5 seconds.
   useEffect(() => {
     const fetchUserFromStorage = () => {
-      chrome.storage.local.get('user', (result) => {
+      storageAdapter.get('user', (result) => {
         if (result.user && JSON.stringify(result.user) !== JSON.stringify(user)) {
           console.log("Pulled new user from storage:", result.user);
           setUser(result.user);
@@ -120,35 +196,35 @@ export const AppDataProvider: FC<AppDataProviderProps> = ({ children }) => {
   }, [user]);
 
   useEffect(() => {
-    chrome.storage.local.set({ portfolios });
+    storageAdapter.set({ portfolios });
   }, [portfolios]);
 
   useEffect(() => {
-    chrome.storage.local.set({ selectedPortfolio });
+    storageAdapter.set({ selectedPortfolio });
   }, [selectedPortfolio]);
 
   useEffect(() => {
-    chrome.storage.local.set({ projects });
+    storageAdapter.set({ projects });
   }, [projects]);
 
   useEffect(() => {
-    chrome.storage.local.set({ selectedProject });
+    storageAdapter.set({ selectedProject });
   }, [selectedProject]);
 
   useEffect(() => {
-    chrome.storage.local.set({ tasks });
+    storageAdapter.set({ tasks });
   }, [tasks]);
 
   useEffect(() => {
-    chrome.storage.local.set({ selectedTask });
+    storageAdapter.set({ selectedTask });
   }, [selectedTask]);
 
   useEffect(() => {
-    chrome.storage.local.set({ niftyToken });
+    storageAdapter.set({ niftyToken });
   }, [niftyToken]);
 
   useEffect(() => {
-    chrome.storage.local.set({ user });
+    storageAdapter.set({ user });
   }, [user]);
 
   return (
